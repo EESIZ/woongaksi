@@ -1,0 +1,42 @@
+You are working on 노션우렁각시 (woongaksi) — a background relay daemon that bridges Notion and AI agents via Telegram. It polls Notion databases, detects changes, and sends them to Telegram so the AI agent already knows the current state without making expensive Notion API calls.
+
+**The entire point of this project is ZERO LLM token cost.** Never add LLM calls to this codebase.
+
+# Why this exists
+- AI agents (OpenClaw, etc.) waste thousands of tokens per Notion API call (tool use + parsing)
+- They also store query results in vector memory → stale data → wrong answers
+- Woongaksi polls Notion directly (pure HTTP, no LLM) and relays changes to the same Telegram chat the AI agent reads
+- Result: AI knows Notion state from chat context, no API call needed
+
+# Architecture
+Entry: `woongaksi/__main__.py` → loads config → initial poll → APScheduler loop
+Per-DB cycle: `client.py` (Notion query) → `differ.py` (cache diff) → `formatter.py` (HTML) → `telegram.py` (send)
+Cache: JSON files in `./cache/`, keyed by database `name`
+
+# Key files
+- `config.py`: `Config` dataclass, `load_config(path)` — merges YAML (DB defs) + env vars (secrets)
+- `client.py`: `query_database(api_key, db_config)` — generic Notion DB query, 14 property types, pagination
+- `differ.py`: `DiffResult` class (.added, .removed, .modified, .has_changes). `compute_diff(old_state, new_items)`.
+- `formatter.py`: `format_changes(db_config, diff)` — Telegram HTML output
+- `telegram.py`: `send_message(token, chat_id, text)` — retry, auto-splits >4096 chars
+- `scheduler.py`: `poll_and_notify(cfg)` orchestrates all DBs. `create_scheduler(cfg)` sets up APScheduler.
+
+# Rules
+- Secrets → env vars only, NEVER in YAML
+- Notion property extraction → centralized in `client.py:_extract_value()`
+- HTML must escape via `formatter.py:_escape_html()`
+- Use relative imports (`from .config import ...`)
+- Python ≥3.10 (uses `list[dict]` type hints)
+- Dependencies: requests, apscheduler >=3.x <4, pyyaml
+- NEVER add LLM/AI calls — this project must stay at zero token cost
+
+# AI agent integration
+- Woongaksi and the AI agent must share the SAME Telegram chat
+- AI agent's system prompt should treat relay messages (📋/📊 prefix) as authoritative real-time Notion data
+- AI should NOT re-query Notion API for data recently received via relay
+
+# Common modifications
+- New DB → add entry to `config.yaml`, restart
+- New Notion property type → add `if ptype == "..."` branch in `client.py:_extract_value()`
+- New notification channel (Slack, etc.) → create module, call from `scheduler.py:_poll_db()`
+- Change format → edit `formatter.py:format_changes()` (Telegram HTML: <b>, <i>, <code>)

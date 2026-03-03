@@ -1,0 +1,38 @@
+# =============================================
+# 노션우렁각시 (woongaksi) 설정 파일
+# =============================================
+# 이 파일을 config.yaml로 복사한 뒤 수정하세요.
+#
+# 데이터베이스 ID 찾는 법:
+#   Notion에서 DB를 전체 페이지로 열면 URL이 이렇게 생겼습니다:
+#   https://notion.so/myworkspace/abc123def456...?v=...
+#                                 ^^^^^^^^^^^^^^^^
+#                                 이 부분이 database ID
+#
+# filter 문법은 Notion API 공식 문서 참조:
+#   https://developers.notion.com/reference/post-database-query-filter
+
+poll_interval_minutes: 5
+
+databases:
+  # ---- 예시 1: 업무 관리 DB ----
+  - name: tasks                        # 내부 식별자 (캐시 파일명에 사용)
+    id: "your-database-id-here"        # Notion DB ID
+    emoji: "📋"                        # 알림 메시지 앞에 붙는 이모지
+    label: "업무"                      # 알림 메시지 제목
+    title_property: "업무명"           # 페이지 제목으로 쓸 프로퍼티명
+    tracked_properties:                # 변경 추적할 프로퍼티 (비우면 전체 추적)
+      - "상태"
+      - "우선순위"
+      - "마감일"
+    filter:                            # Notion API 필터 (생략하면 전체 조회)
+      property: "상태"
+      select:
+        does_not_equal: "완료"
+
+  # ---- 예시 2: 프로젝트 DB (필터 없이 전체 조회) ----
+  # - name: projects
+  #   id: "another-database-id"
+  #   emoji: "📊"
+  #   label: "프로젝트"
+  #   title_property: "Name"

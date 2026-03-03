@@ -1,0 +1,32 @@
+# systemd user service for 노션우렁각시
+#
+# 설치:
+#   mkdir -p ~/.config/woongaksi
+#   cp config.yaml ~/.config/woongaksi/
+#   cp examples/woongaksi.service ~/.config/systemd/user/
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now woongaksi
+#
+# 로그 확인:
+#   journalctl --user -u woongaksi -f
+
+[Unit]
+Description=노션우렁각시 — Notion 변경 릴레이 데몬
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/.config/woongaksi
+ExecStart=%h/.local/bin/woongaksi --config %h/.config/woongaksi/config.yaml
+Restart=on-failure
+RestartSec=30
+
+# 환경변수 (직접 입력 또는 EnvironmentFile 사용)
+# EnvironmentFile=%h/.config/woongaksi/.env
+Environment=NOTION_API_KEY=secret_xxxx
+Environment=TELEGRAM_BOT_TOKEN=123456789:ABCdefGHI
+Environment=TELEGRAM_CHAT_ID=123456789
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Config with secrets
+config.yaml
+.env
+
+# Runtime
+cache/
+*.log
