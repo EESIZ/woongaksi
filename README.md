@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="gaksi.png" alt="노션우렁각시" width="720">
+</p>
+
 # 노션우렁각시 (woongaksi)
 
 > 사람이 Notion을 수정하면 AI 에이전트가 자동으로 알게 해주는 백그라운드 릴레이 데몬.
