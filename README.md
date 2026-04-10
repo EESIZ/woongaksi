@@ -262,6 +262,11 @@ title, rich_text, select, multi_select, date, number, checkbox, status, url, ema
 | 최초 실행 시 알림 없음 | 정상 (캐시 시딩) | 두 번째 폴링부터 알림 시작 |
 | 동일 변경 반복 알림 | 캐시 파일 손상 | `cache/` 디렉토리 삭제 후 재시작 |
 
+## 지원
+혹시 도움이 되셨다면...
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V21XAPRC)
+
+
 ## License
 
 MIT
